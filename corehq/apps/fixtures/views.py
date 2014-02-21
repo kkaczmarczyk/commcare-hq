@@ -15,8 +15,8 @@ from django.views.generic.base import TemplateView
 from django.shortcuts import render
 
 from corehq.apps.domain.decorators import login_or_digest
-from corehq.apps.fixtures.models import FixtureDataType, FixtureDataItem, _id_from_doc, FieldList, FixtureTypeField, FixtureItemField
 from corehq.apps.fixtures.exceptions import ExcelMalformatException, FixtureAPIException
+from corehq.apps.fixtures.models import FixtureDataType, FixtureDataItem, _id_from_doc, FieldList, FixtureTypeField, FixtureItemField
 from corehq.apps.groups.models import Group
 from corehq.apps.reports.datatables import DataTablesHeader, DataTablesColumn, DataTablesColumnGroup
 from corehq.apps.reports.util import format_datatables_data
@@ -318,6 +318,7 @@ def download_item_lists(request, domain, html_response=False):
     format = Format.XLS_2007
     return json_response({"path": path})
 
+@require_can_edit_fixtures
 def download_file(request, domain):
     path = request.GET.get("path")
     format = Format.XLS_2007
@@ -326,6 +327,7 @@ def download_file(request, domain):
         return response
     except IOError:
         return HttpResponseRedirect(reverse("fixture_interface_dispatcher", args=[], kwargs={'domain': domain, 'report_slug': 'edit_lookup_tables'}))
+
 
 class UploadItemLists(TemplateView):
 
