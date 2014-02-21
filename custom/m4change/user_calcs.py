@@ -30,6 +30,24 @@ class AncAntenatalAttendanceCalculator(fluff.Calculator):
             yield [date, dates[date]]
 
 
+class PncAttendanceWithin6WeeksCalculator(fluff.Calculator):
+
+    @fluff.date_emitter
+    def total(self, case):
+        dates = dict()
+        for form in case.get_forms():
+            if form.xmlns in BOOKING_AND_FOLLOW_UP_FORMS:
+                visits = str(form.form.get("visits", 0))
+                if not visits.isdigit():
+                    visits = 0
+                visits = int(visits)
+                if form.received_on not in dates:
+                    dates[form.received_on] = visits
+                else:
+                    dates[form.received_on] += visits
+        for date in dates:
+            yield [date, dates[date]]
+
 class AncAntenatalVisitBefore20WeeksCalculator(fluff.Calculator):
 
     @fluff.date_emitter
